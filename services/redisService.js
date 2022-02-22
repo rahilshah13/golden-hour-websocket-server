@@ -13,6 +13,8 @@ redisClient.on('error', err => {
     console.log('Error ' + err);
 });
 
+console.log("new connection yay!!");
+
 async function createUserSession(user) {
     const res = await redisClient.get(user.email);
     if(res === null) {
