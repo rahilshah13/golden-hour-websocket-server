@@ -1,6 +1,6 @@
 const redis = require('redis');
 const redisClient = redis.createClient({
-    url: process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:6379`: null
+    url: process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:6379`: ""
 });
 
 (async () => await redisClient.connect())();
