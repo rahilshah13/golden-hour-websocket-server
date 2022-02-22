@@ -3,8 +3,6 @@ const redisClient = redis.createClient({
     url: process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:6379`: ""
 }); 
 
-console.log("yeehaw!");
-
 (async () => await redisClient.connect())();
 
 redisClient.on('connect', () => {
@@ -14,8 +12,6 @@ redisClient.on('connect', () => {
 redisClient.on('error', err => {
     console.log('Error ' + err);
 });
-
-console.log("new connection yay!!");
 
 async function createUserSession(user) {
     const res = await redisClient.get(user.email);
