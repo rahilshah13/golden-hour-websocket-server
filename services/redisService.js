@@ -3,6 +3,8 @@ const redisClient = redis.createClient({
     url: process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:6379`: ""
 }); 
 
+console.log("yeehaw!");
+
 (async () => await redisClient.connect())();
 
 redisClient.on('connect', () => {
