@@ -8,13 +8,8 @@ const { createUserSession, getUserSession, userReady, userUnready} = require('./
 
 const io = new Server(httpServer, { cors: { origin: "*", methods: ["GET", "POST"] } });
 
-io.use((socket, next) => {
-    console.log("server reached.");
-    next(socket);
-});
 // upon entering the lobby after signing in
 io.on("connection", async (socket) => {
-
     const token = socket.handshake.auth.token;
     console.log("new connection wtf.");
     // validate token
