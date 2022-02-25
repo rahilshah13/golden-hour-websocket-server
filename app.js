@@ -8,8 +8,24 @@ const { createUserSession, getUserSession, userReady, userUnready} = require('./
 
 const io = new Server(httpServer, { cors: { origin: "*", methods: ["GET", "POST"] } });
 
+io.of("/socket-io").on("connection", async (socket) => {
+    console.log("sigmaballs");
+    socket.emit("connection", {
+        "nUsers": socket.adapter.rooms.get('lobby').size || 1,
+        "startTime":  debugEvent.toUTCString()
+    });
+});
+
+io.of("/socket.io").on("connection", async (socket) => {
+    console.log("poopma pants");
+    socket.emit("connection", {
+        "nUsers": socket.adapter.rooms.get('lobby').size || 1,
+        "startTime":  debugEvent.toUTCString()
+    });
+});
+
 // upon entering the lobby after signing in
-io.on("connection", async (socket) => {
+io.of("/").on("connection", async (socket) => {
     const token = socket.handshake.auth.token;
     console.log("new connection wtf.");
     // validate token
