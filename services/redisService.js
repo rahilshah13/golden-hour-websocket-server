@@ -1,3 +1,7 @@
+/* run with visualizer:
+    docker run --rm -p 5001:5001 --link redis:latest marian/rebrow
+    use name of redis container for "host name"
+*/
 const redis = require('redis');
 const redisClient = redis.createClient({
     url: process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:6379`: ""
@@ -7,16 +11,28 @@ const redisClient = redis.createClient({
 
 redisClient.on('connect', () => {
     console.log("connected to redis.");
+    //insertDummyData();
 });
 
 redisClient.on('error', err => {
     console.log('Error ' + err);
 });
 
+//////////
+async function insertDummyData(){
+    const names = ["ligma", "sigma", "joe", "joseph", "bob", "carl", "doug", "kodak", "shelly", "plankton"];
+    for(let i=0; i < 20; i++ ) {
+        let email = names[(Math.floor(Math.random() * 100)) % 10].concat(names[(Math.floor(Math.random() * 100)) % 10]);
+        await redisClient.set(email.concat("@vt.edu"), '{"email":"","state":"not_ready","gender":0.5,"seeking":{"low":0,"high":1},"year":{"low":"fr","high":"grad"}}');
+    }
+}
+///////////
+
 async function createUserSession(user) {
+    console.log(user.email)
     const res = await redisClient.get(user.email);
     if(res === null) {
-        const base = {"email": "", "state": "not_ready", "gender": .5, "seeking": {low: 0, high: 1}, "year": {"low": "fr", "high": "grad"}};
+        const base = {email: "", state: "not_ready", gender: .5, seeking: {low: 0, high: 1}, year: {low: "fr", high: "grad"}};
         await redisClient.set(user.email, JSON.stringify(base));
     }
 }
@@ -26,11 +42,12 @@ async function getUserSession(email) {
     return await redisClient.get(email);
 }
 
-async function userReady(user) {
+async function userReady(user, email) {
+
     if(!validateUserInput(user))
         return false;
 
-    await redisClient.set(user.email, JSON.stringify({...user, ready: true}));
+    await redisClient.set(email, JSON.stringify({...user, ready: true}));
     return true;
 }
 
@@ -43,14 +60,20 @@ async function userUnready(user) {
 
 function validateUserInput(user) {
     return (isFloat(user.gender) &&
-        Array.isArray(user.preferences) &&
-        user.preferences[0] < user.preferences[1] &&
-        isFloat(user.preferences[0]) &&
-        isFloat(user.preferences[1]) &&
+        user.preference.length === 2 &&
+        user.preference[0] < user.preference[1] &&
+        user.preference[0] >= 0 &&
+        user.preference[1] <= 1 &&
         user.wavelength.length < 70 &&
         user.wavelength.length > 0
     );
 }
+
+async function addOffer() {
+
+}
+
+
 
 const isFloat = (n) => {return Number(n) === n && n % 1 !== 0};
 
